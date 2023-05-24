@@ -61,12 +61,9 @@ Scriblo Team</p>
     $stmt->execute();
     // cleck if successfully inserted
     if ($stmt) {
+        ResponseHandler::sendResponse(200, "Successfully inserted");
         $emailSent = EmailSender::sendEmail($email, "Thanks For Joining Our Waitlist! 🎉", $emailMessage, "hello@myscriblo.com", "Scriblo Team");
-        if ($emailSent) {
-            ResponseHandler::sendResponse(200, "Successfully inserted & email sent");
-        } else {
-            ResponseHandler::sendResponse(500, "Error sending email");
-        }
+   
 
     } else {
         ResponseHandler::sendResponse(500, "Error inserting");
