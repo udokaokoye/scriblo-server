@@ -50,7 +50,8 @@ Scriblo Team</p>
 </body>
 </html>
     ";
-        $query = "SELECT * FROM `waitlist` WHERE `email` = '$email' ";
+        $preEmail = $_POST['email'];
+        $query = "SELECT * FROM `waitlist` WHERE `email` = '$preEmail' ";
         $result = $conn->query($query);
         // get number of rows
         $num_rows = $result->num_rows;
