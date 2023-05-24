@@ -50,6 +50,15 @@ Scriblo Team</p>
 </body>
 </html>
     ";
+        $query = "SELECT * FROM `waitlist` WHERE `email` = '$email' ";
+        $result = $conn->query($query);
+        // get number of rows
+        $num_rows = $result->num_rows;
+        if ($num_rows > 0) {
+            ResponseHandler::sendResponse(400, "Email already exists");
+            exit();
+        }
+
     $query = "INSERT INTO `waitlist` (`email`) VALUES (?) "; // ? is a placeholder
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $email); // "s" - string, "i" - int, "d" - double, "b" - blob
@@ -63,7 +72,7 @@ Scriblo Team</p>
     if ($stmt) {
         ResponseHandler::sendResponse(200, "Successfully inserted");
         $emailSent = EmailSender::sendEmail($email, "Thanks For Joining Our Waitlist! 🎉", $emailMessage, "hello@myscriblo.com", "Scriblo Team");
-   
+        
 
     } else {
         ResponseHandler::sendResponse(500, "Error inserting");
