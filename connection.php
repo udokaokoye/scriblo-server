@@ -1,4 +1,7 @@
 <?php
+header( 'Access-Control-Allow-Origin: *' );
+header( 'Access-Control-Allow-Methods: GET, POST, OPTIONS' );
+header( 'Access-Control-Allow-Headers: *' );
 // connect to databse boilerplate
 $servername = "localhost";
 $username = "u896018919_scribloADMIN";
