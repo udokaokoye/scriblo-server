@@ -36,14 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <img src='https://scriblo.s3.us-east-2.amazonaws.com/branding/Vector.png' alt='brand logo' />
     <h3>Hey There 👋 thank You for Joining the Waitlist! </h3>
       
-        <p>We appreciate your interest in our application 🎉. You are now on our waitlist, and we're excited to have you onboard 😄. Be the first to experience our powerful blogging platform that empowers writers like you to share their ideas with the world  🚀.</p>
+        <p>We appreciate your interest in our application. You are now on our waitlist, and we're excited to have you onboard. Be the first to experience our powerful blogging platform that empowers writers like you to share their ideas with the world.</p>
       
-      <p>As a valued member of our community, you'll receive exclusive updates, early access, and special offers. We can't wait to show you what we've been working on 🤩!</p>
+      <p>As a valued member of our community, you'll receive exclusive updates, early access, and special offers. We can't wait to show you what we've been working on!</p>
       
       <p> Thank you again for joining the waitlist. We're thrilled to have you as part of our journey! </p>
       
       <p>Best regards, </br>
-Scriblo Team 🚀</p>
+Scriblo Team</p>
   <img src='https://scriblo.s3.us-east-2.amazonaws.com/branding/brandLogo_black.png' alt='brand logo' width='10%' />
   
     </div>
