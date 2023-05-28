@@ -1,4 +1,6 @@
 <?php
+include_once './config/database.php';
+include_once './utils/JwtUtility.php';
 // $requestUri = $_SERVER['REQUEST_URI'];
 // $requestMethod = $_SERVER['REQUEST_METHOD'];
 
@@ -11,4 +13,5 @@
 // } else {
 //     echo json_encode(['error' => 'Route not found']);
 // }
-echo json_encode(uniqid());
+JwtUtility::verifyHttpAuthorization();
+echo json_encode("Hello World");
