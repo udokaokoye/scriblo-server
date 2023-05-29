@@ -2,6 +2,7 @@
 include_once '../../config/Database.php';
 include_once '../../models/User.php';
 include_once '../../utils/ResponseHandler.php';
+include_once '../../utils/JwtUtility.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -19,7 +20,7 @@ if ($method === 'GET') {
     $userExists = $user->checkIfUserExists($_GET['email']);
 
     if ($userExists) {
-        echo ResponseHandler::sendResponse(200, true);
+        echo ResponseHandler::sendResponse(200, true, null, JwtUtility::generateToken(["email" => $_GET["email"]], "+5 minutes"));
     } else {
         echo ResponseHandler::sendResponse(200, false);
     }
