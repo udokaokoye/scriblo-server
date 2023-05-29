@@ -11,7 +11,7 @@ include_once '../../utils/JwtUtility.php';
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method == 'GET') {
-    JwtUtility::verifyHttpAuthorization();
+    // JwtUtility::verifyHttpAuthorization();
 
     if (!isset($_GET['email'])) {
         echo ResponseHandler::sendResponse(400, 'Email not provided');
