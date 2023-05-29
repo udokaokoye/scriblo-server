@@ -13,5 +13,5 @@ include_once './utils/JwtUtility.php';
 // } else {
 //     echo json_encode(['error' => 'Route not found']);
 // }
-JwtUtility::verifyHttpAuthorization();
-echo json_encode("Hello World");
+// JwtUtility::verifyHttpAuthorization();
+echo json_encode($_SERVER['HTTP_AUTHORIZATION']);

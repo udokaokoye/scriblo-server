@@ -41,9 +41,19 @@ class User
         }
     }
 
-    public function getUser($id)
+    public function getUser($email)
     {
         // Code to fetch a single user from the database
+        $query = 'SELECT * FROM ' . $this->table . ' WHERE email = ?';
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($user) {
+            return $user;
+        } else {
+            return false;
+        }
+            
     }
 
     public function updateUser($id, $userData)

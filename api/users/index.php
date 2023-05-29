@@ -13,17 +13,38 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method == 'GET') {
     JwtUtility::verifyHttpAuthorization();
 
+    if (!isset($_GET['email'])) {
+        echo ResponseHandler::sendResponse(400, 'Email not provided');
+        return;
+    }
+
+    if(isset($_GET['with']) && $_GET['with'] == 'token') {
+        $database = new Database();
+        $db = $database->connect();
+
+        $user = new User($db);
+        $userResult = $user->getUser($_GET['email']);
+        if ($userResult == null) {
+            echo ResponseHandler::sendResponse(404, 'User not found');
+            return;
+        }
+        $userResult['token'] = JwtUtility::generateToken(["email" => $_GET["email"]], "+30 days");
+
+        echo ResponseHandler::sendResponse(200, 'User retrieved successfully', $userResult);
+        return;
+    }
+
     $database = new Database();
     $db = $database->connect();
 
     $user = new User($db);
-    $userResult = $user->getAllUsers();
+    $userResult = $user->getUser($_GET['email']);
     if ($userResult == null) {
-        echo ResponseHandler::sendResponse(500, 'User could not be retrieved');
+        echo ResponseHandler::sendResponse(404, 'User not found');
         return;
     }
 
-    echo json_encode($userResult);
+    echo ResponseHandler::sendResponse(200, 'User retrieved successfully', $userResult);
 } else if ($method == 'POST') {
     $database = new Database();
     $db = $database->connect();
@@ -40,8 +61,8 @@ if ($method == 'GET') {
         echo ResponseHandler::sendResponse(500, 'User could not be added');
         return;
     }
-    $token = JwtUtility::generateToken(['email' => $_POST['email']], '+5 minutes');
-    echo ResponseHandler::sendResponse(200, 'User added successfully', $token=$token);
+    $token = JwtUtility::generateToken(["email" => $_POST["email"]], "+5 minutes");
+    echo ResponseHandler::sendResponse(200, 'User added successfully', null, $token);
 }else {
     echo json_encode(['error' => 'Method not allowed']);
 }

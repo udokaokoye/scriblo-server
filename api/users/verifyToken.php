@@ -4,6 +4,7 @@ include_once '../../config/Database.php';
 include_once '../../models/User.php';
 include_once '../../utils/ResponseHandler.php';
 include_once '../../utils/TokenGenerator.php';
+include_once '../../utils/JwtUtility.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -37,7 +38,13 @@ if ($method === 'POST') {
         echo ResponseHandler::sendResponse(400, 'Token is incorrect');
         return;
     } else {
-        echo ResponseHandler::sendResponse(200, 'Token verified');
+        if (isset($_POST['withToken']) && $_POST['withToken'] == true) {
+            $JWTtoken =  JwtUtility::generateToken(["email" => $_POST["email"]], "+5 minutes");
+            echo ResponseHandler::sendResponse(200, 'Token verified', null, $JWTtoken);
+        } else {
+            echo ResponseHandler::sendResponse(200, 'Token verified');
+        }
+
         // delete token from database
         $query = 'DELETE FROM tokens WHERE email = ?';
         $stmt = $db->prepare($query);
