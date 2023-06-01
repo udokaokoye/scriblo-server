@@ -37,14 +37,7 @@ CREATE TABLE `bookmarks` (
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `categories`
---
 
-CREATE TABLE `categories` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -115,8 +108,7 @@ CREATE TABLE `posts` (
   `authorId` int(11) NOT NULL,
   `title` varchar(500) NOT NULL,
   `content` text NOT NULL,
-  `tags` int(11) NOT NULL,
-  `categoryId` int(11) NOT NULL,
+  `tags` text NOT NULL,
   `publishDate` datetime NOT NULL,
   `isHidden` varchar(10) NOT NULL,
   `createdAt` datetime NOT NULL
@@ -198,10 +190,7 @@ ALTER TABLE `bookmarks`
   ADD KEY `fk_bookmarks_postId` (`postId`);
 
 --
--- Indexes for table `categories`
---
-ALTER TABLE `categories`
-  ADD PRIMARY KEY (`id`);
+
 
 --
 -- Indexes for table `comments`
@@ -240,8 +229,6 @@ ALTER TABLE `notifications`
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_posts_authorId` (`authorId`),
-  ADD KEY `fk_posts_tags` (`tags`),
-  ADD KEY `fk_posts_categoryId` (`categoryId`);
 
 --
 -- Indexes for table `reports`
@@ -331,8 +318,6 @@ ALTER TABLE `notifications`
 --
 ALTER TABLE `posts`
   ADD CONSTRAINT `fk_posts_authorId` FOREIGN KEY (`authorId`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `fk_posts_categoryId` FOREIGN KEY (`categoryId`) REFERENCES `categories` (`id`),
-  ADD CONSTRAINT `fk_posts_tags` FOREIGN KEY (`tags`) REFERENCES `tags` (`id`);
 
 --
 -- Constraints for table `reports`
