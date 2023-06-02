@@ -35,12 +35,12 @@ class Post {
         $this->slug = htmlspecialchars(strip_tags($postData['slug']));
         $this->authorId = htmlspecialchars(strip_tags($postData['authorId']));
         $this->title = htmlspecialchars(strip_tags($postData['title']));
-        $this->content = htmlspecialchars(strip_tags($postData['content']));
+        $this->content = $postData['content'];
         $this->tags = htmlspecialchars(strip_tags($postData['tags']));
         $this->publishDate = htmlspecialchars(strip_tags($postData['publishDate']));
         $this->isHidden = htmlspecialchars(strip_tags($postData['isHidden']));
         $this->createdAt = htmlspecialchars(strip_tags($postData['createdAt']));
-        $this->mediaFiles = htmlspecialchars(strip_tags($postData['mediaFiles']));
+        $this->mediaFiles = serialize($postData['mediaFiles']);
         $this->tagsIDs = htmlspecialchars(strip_tags($postData['tagsIDs']));
         // Bind data
         $stmt->bindParam(1, $this->slug);
@@ -52,7 +52,7 @@ class Post {
         $stmt->bindParam(7, $this->isHidden);
         $stmt->bindParam(8, $this->createdAt);
         $stmt->bindParam(9, $this->mediaFiles);
-        
+
     
 
         // Execute query

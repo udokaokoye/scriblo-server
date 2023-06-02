@@ -5,7 +5,7 @@
 
 header( 'Access-Control-Allow-Origin: *' );
 header( 'Access-Control-Allow-Methods: *' );
-header( 'Access-Control-Allow-Headers: x-requested-with, Content-Type, origin, authorization, accept, client-security-token' );
+header( 'Access-Control-Allow-Headers: *' );
 
 class Database {
     // DB Params

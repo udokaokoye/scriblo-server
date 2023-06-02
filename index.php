@@ -1,6 +1,7 @@
 <?php
 include_once './config/database.php';
 include_once './utils/JwtUtility.php';
+include_once './utils/ResponseHandler.php';
 // $requestUri = $_SERVER['REQUEST_URI'];
 // $requestMethod = $_SERVER['REQUEST_METHOD'];
 
@@ -14,4 +15,4 @@ include_once './utils/JwtUtility.php';
 //     echo json_encode(['error' => 'Route not found']);
 // }
 // JwtUtility::verifyHttpAuthorization();
-echo json_encode($_SERVER['HTTP_AUTHORIZATION']);
+echo ResponseHandler::sendResponse(200, 'User retrieved successfully');
