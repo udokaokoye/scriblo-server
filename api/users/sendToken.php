@@ -31,6 +31,7 @@ if ($method === 'POST') {
         $stmt = $db->prepare($query);
         $stmt->execute([$_POST['email']]);
     }
+
     
 
     // Add 10 minutes to the current date and time
@@ -42,7 +43,6 @@ if ($method === 'POST') {
     $query = 'INSERT INTO tokens (token, email, expires) VALUES (?, ?, ?)';
     $stmt = $db->prepare($query);
     $stmt->execute([$hashedToken, $_POST['email'], $expirationDate]); // $_POST['email'] is the email of the user who is requesting a token
-
     if ($stmt) {
         $emailSent = EmailClient::sendEmail($_POST['email'], 'Scriblo - Your 5 digit verification token', 'Your token is ' . $token, ' hello@scriblo.com', ', Scriblo');
         if ($emailSent) {
