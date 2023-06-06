@@ -21,4 +21,6 @@ class ResponseHandler {
         // Send the JSON response to JavaScript
         echo $jsonResponse;
     }
+
+
 }

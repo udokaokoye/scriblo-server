@@ -15,4 +15,5 @@ include_once './utils/ResponseHandler.php';
 //     echo json_encode(['error' => 'Route not found']);
 // }
 // JwtUtility::verifyHttpAuthorization();
+
 echo ResponseHandler::sendResponse(200, 'User retrieved successfully');
