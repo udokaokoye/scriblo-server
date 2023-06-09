@@ -12,6 +12,8 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method == 'POST') {
     JwtUtility::verifyHttpAuthorization();
+    // ResponseHandler::sendResponse(200, 'Post added');
+    // return;
 
     $database = new Database();
     $db = $database->connect();
@@ -34,22 +36,33 @@ if ($method == 'POST') {
         echo ResponseHandler::sendResponse(400, 'Post not added');
     }
 } 
-else if($method == 'GET') {
-    JwtUtility::verifyHttpAuthorization();
+if($method == 'GET') {
+    // JwtUtility::verifyHttpAuthorization();
     $database = new Database();
     $db = $database->connect();
 
     $post = new Post($db);
+    $posts = null;
 
-    $posts = $post->getPosts($_GET['categories']);
+    if (isset($_GET['categories'])) {
+        $posts = $post->getPosts($_GET['categories']);
+    } 
+    // else {
+    //     $posts = $post->getPosts(null);
+    // }
+
+    if (isset($_GET['search']) && isset($_GET['class'])) {
+        $posts = $post->searchPosts($_GET['search'], $_GET['class']);
+    } 
+    
 
     if ($posts) {
         echo ResponseHandler::sendResponse(200, null, $posts);
     } else {
-        echo ResponseHandler::sendResponse(400, 'No posts found');
+        echo ResponseHandler::sendResponse(200, 'No posts found');
     }
 } 
-else if($method == 'DELETE') {
+if($method == 'DELETE') {
     JwtUtility::verifyHttpAuthorization();
 
     $database = new Database();
@@ -70,7 +83,7 @@ else if($method == 'DELETE') {
         echo ResponseHandler::sendResponse(400, 'Post not deleted');
     }
 } 
-else if($method == 'PATCH') {
+if($method == 'PATCH') {
     JwtUtility::verifyHttpAuthorization();
 
     $database = new Database();
@@ -91,9 +104,9 @@ else if($method == 'PATCH') {
         echo ResponseHandler::sendResponse(400, 'Post not updated');
     }
 } 
-else {
-    echo ResponseHandler::sendResponse(405, 'Method not allowed');
-}
+
+// echo ResponseHandler::sendResponse(405, 'Method not allowed');
+
 // else if($method == "PATCH") {
 //     // JwtUtility::verifyHttpAuthorization();
 //     $database = new Database();

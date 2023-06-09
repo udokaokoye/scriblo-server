@@ -89,34 +89,77 @@ class Post
     public function getPosts($categories)
     {
 
-        if (isset($categories)) {
+        if (isset($categories) && $categories != 'all') {
             try {
-                $query = "SELECT DISTINCT posts.*
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
                 JOIN post_tags ON posts.id = post_tags.postId
+                JOIN users u ON posts.authorId = u.id
                 JOIN tags ON post_tags.tagId = tags.id
-                WHERE tags.id IN ($categories)";
+                WHERE tags.id IN ($categories) ORDER BY posts.createdAt DESC";
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute();
 
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                echo ResponseHandler::sendResponse(500, $e->getMessage());
+                return;
+            }
+        } 
+        else {
+            try {
+                $query = " SELECT DISTINCT posts.*, u.name AS authorName, u.email AS authorEmail, u.avatar AS authorAvatar 
+                FROM posts
+                JOIN post_tags ON posts.id = post_tags.postId
+                JOIN users u ON posts.authorId = u.id ORDER BY posts.createdAt DESC
+                ";
+                // Prepare statement
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute();
+
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                echo ResponseHandler::sendResponse(500, $e->getMessage());
+                return;
+            }
+        }
+    }
+
+    public function searchPosts($searchQuery, $class) {
+        if($class == 'articles') {
+            try {
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.email AS authorEmail, u.avatar AS authorAvatar 
+                FROM posts
+                JOIN post_tags ON posts.id = post_tags.postId
+                JOIN users u ON posts.authorId = u.id
+                JOIN tags ON post_tags.tagId = tags.id
+                WHERE posts.title LIKE '%$searchQuery%' OR 
+                posts.slug LIKE '%$searchQuery%' OR 
+                tags.name LIKE '%$searchQuery%' ORDER BY posts.createdAt DESC";
+                // Prepare statement
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute();
+    
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                echo ResponseHandler::sendResponse(500, $e->getMessage());
+                return;
+            }
+        } else if ($class == 'people') {
+            try {
+                $query = "SELECT * FROM users WHERE name LIKE '%$searchQuery%' OR email ORDER BY createdAt DESC";
+                // Prepare statement
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute();
+    
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (Exception $e) {
                 echo ResponseHandler::sendResponse(500, $e->getMessage());
                 return;
             }
         } else {
-            try {
-                $query = 'SELECT * FROM ' . $this->table . ' WHERE isHidden = 0 ORDER BY publishDate DESC';
-                // Prepare statement
-                $stmt = $this->conn->prepare($query);
-                $stmt->execute();
-
-                return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } catch (Exception $e) {
-                echo ResponseHandler::sendResponse(500, $e->getMessage());
-                return;
-            }
+            return null;
         }
     }
 
