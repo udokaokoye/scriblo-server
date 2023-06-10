@@ -62,27 +62,27 @@ if($method == 'GET') {
         echo ResponseHandler::sendResponse(200, 'No posts found');
     }
 } 
-if($method == 'DELETE') {
-    JwtUtility::verifyHttpAuthorization();
+// if($method == 'DELETE') {
+//     JwtUtility::verifyHttpAuthorization();
 
-    $database = new Database();
-    $db = $database->connect();
+//     $database = new Database();
+//     $db = $database->connect();
 
-    $post = new Post($db);
+//     $post = new Post($db);
 
-    if (!isset($_GET['id'])) {
-        echo ResponseHandler::sendResponse(400, 'Id is required');
-        return;
-    }
+//     if (!isset($_GET['id'])) {
+//         echo ResponseHandler::sendResponse(400, 'Id is required');
+//         return;
+//     }
 
-    $postDeleted = $post->deletePost($_GET['id']);
+//     $postDeleted = $post->deletePost($_GET['id']);
 
-    if ($postDeleted) {
-        echo ResponseHandler::sendResponse(200, 'Post deleted');
-    } else {
-        echo ResponseHandler::sendResponse(400, 'Post not deleted');
-    }
-} 
+//     if ($postDeleted) {
+//         echo ResponseHandler::sendResponse(200, 'Post deleted');
+//     } else {
+//         echo ResponseHandler::sendResponse(400, 'Post not deleted');
+//     }
+// } 
 if($method == 'PATCH') {
     JwtUtility::verifyHttpAuthorization();
 
