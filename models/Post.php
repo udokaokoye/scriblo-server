@@ -71,6 +71,13 @@ class Post
                     $this->updatePostTagRelationshipTable($this->conn->lastInsertId());
                     return true;
                 }
+                // query update slug with id
+                $upadatedSlug = $this->slug . '-' . $this->conn->lastInsertId();
+                $query = "UPDATE posts SET slug = ? WHERE id = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(1, $upadatedSlug);
+                $stmt->bindParam(2, $this->conn->lastInsertId());
+                $stmt->execute();
 
                 return true;
             }
@@ -91,7 +98,7 @@ class Post
 
         if (isset($categories) && $categories != 'all') {
             try {
-                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.email AS authorEmail, u.avatar AS authorAvatar 
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id
@@ -109,7 +116,7 @@ class Post
         } 
         else {
             try {
-                $query = " SELECT DISTINCT posts.*, u.name AS authorName, u.email AS authorEmail, u.avatar AS authorAvatar 
+                $query = " SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id ORDER BY posts.createdAt DESC
@@ -129,7 +136,7 @@ class Post
     public function searchPosts($searchQuery, $class) {
         if($class == 'articles') {
             try {
-                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.email AS authorEmail, u.avatar AS authorAvatar 
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id
@@ -158,7 +165,26 @@ class Post
                 echo ResponseHandler::sendResponse(500, $e->getMessage());
                 return;
             }
-        } else {
+        } else if($class == 'tags') {
+            try {
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+                FROM posts
+                JOIN post_tags ON posts.id = post_tags.postId
+                JOIN users u ON posts.authorId = u.id
+                JOIN tags ON post_tags.tagId = tags.id
+                WHERE tags.name LIKE '%$searchQuery%' ORDER BY posts.createdAt DESC";
+                // Prepare statement
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute();
+    
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                echo ResponseHandler::sendResponse(500, $e->getMessage());
+                return;
+            }
+        }
+
+         else {
             return null;
         }
     }
