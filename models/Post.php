@@ -69,7 +69,7 @@ class Post
 
                 if ($this->isHidden == 0) {
                     $this->updatePostTagRelationshipTable($this->conn->lastInsertId());
-                    return true;
+                    // return true;
                 }
                 // query update slug with id
                 $upadatedSlug = $this->slug . '-' . $this->conn->lastInsertId();
@@ -113,8 +113,7 @@ class Post
                 echo ResponseHandler::sendResponse(500, $e->getMessage());
                 return;
             }
-        } 
-        else {
+        } else {
             try {
                 $query = " SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
@@ -133,8 +132,29 @@ class Post
         }
     }
 
-    public function searchPosts($searchQuery, $class) {
-        if($class == 'articles') {
+    public function getPost($slug)
+    {
+        try {
+            $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.bio AS authorBio, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+            FROM posts
+            -- JOIN post_tags ON posts.id = post_tags.postId
+            JOIN users u ON posts.authorId = u.id
+            -- JOIN tags ON post_tags.tagId = tags.id
+            WHERE posts.slug = '$slug'";
+            // Prepare statement
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return;
+        }
+    }
+
+    public function searchPosts($searchQuery, $class)
+    {
+        if ($class == 'articles') {
             try {
                 $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
@@ -147,7 +167,7 @@ class Post
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute();
-    
+
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (Exception $e) {
                 echo ResponseHandler::sendResponse(500, $e->getMessage());
@@ -159,13 +179,13 @@ class Post
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute();
-    
+
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (Exception $e) {
                 echo ResponseHandler::sendResponse(500, $e->getMessage());
                 return;
             }
-        } else if($class == 'tags') {
+        } else if ($class == 'tags') {
             try {
                 $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
@@ -176,15 +196,13 @@ class Post
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute();
-    
+
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (Exception $e) {
                 echo ResponseHandler::sendResponse(500, $e->getMessage());
                 return;
             }
-        }
-
-         else {
+        } else {
             return null;
         }
     }
@@ -238,6 +256,122 @@ class Post
             foreach ($tags as $tag) {
                 $stmt->execute([$postId, $tag]);
             }
+            return true;
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return;
+        }
+    }
+
+
+    // POST ACTIONS
+
+    public function likePost($postID, $userID, $date)
+    {
+        try {
+            $query = "INSERT INTO likes (postId, userId, createdAt) VALUES (?, ?, ?)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$postID, $userID, $date]);
+            return true;
+        } catch (Exception $e) {
+            // check if error is duplicate entry
+            if ($e->getCode() == 23000) {
+                $query = "DELETE FROM likes WHERE postId = ? AND userId = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute([$postID, $userID]);
+                return true;
+            }
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return false;
+        }
+    }
+
+    public function commentPost($postID, $userID, $comment, $date, $replyID)
+    {
+        try {
+            if ($replyID == null) {
+                $query = "INSERT INTO comments (postId, userId, content, createdAt) VALUES (?, ?, ?, ?)";
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute([$postID, $userID, $comment, $date]);
+                return true;
+            } else {
+                $query = "INSERT INTO comments (postId, userId, content, replyId, createdAt) VALUES (?, ?, ?, ?, ?)";
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute([$postID, $userID, $comment, $replyID, $date]);
+                return true;
+            }
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return false;
+        }
+    }
+
+    public function bookmarkPost($postID, $userID, $date)
+    {
+        try {
+            $query = "INSERT INTO bookmarks (postId, userId, createdAt) VALUES (?, ?, ?)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$postID, $userID, $date]);
+            return true;
+        } catch (Exception $e) {
+            // check if error is duplicate entry
+            if ($e->getCode() == 23000) {
+                $query = "DELETE FROM bookmarks WHERE postId = ? AND userId = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute([$postID, $userID]);
+                return true;
+            }
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getCommnets($postID)
+    {
+        try {
+            $query = "SELECT comments.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar  FROM `comments` JOIN users u ON comments.userID = u.id WHERE comments.postId = '$postID' ORDER BY comments.createdAt DESC ";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getBookmarks($userID)
+    {
+        try {
+            $query = "SELECT * FROM bookmarks WHERE userID = '$userID'";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getLikes ($postID) {
+        try {
+            $query = "SELECT * FROM likes WHERE postId = '$postID'";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return;
+        }
+    }
+
+    public function deleteComment($commentId) {
+        try {
+            $query = "DELETE FROM comments WHERE id = '$commentId' OR replyId = '$commentId' ";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
             return true;
         } catch (Exception $e) {
             echo ResponseHandler::sendResponse(500, $e->getMessage());

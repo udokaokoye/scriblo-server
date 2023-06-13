@@ -52,7 +52,7 @@ if($method == 'GET') {
     } 
 
     if (isset($_GET['slug'])) {
-        # code...
+        $posts = $post->getPost($_GET['slug']);
     }
     
 

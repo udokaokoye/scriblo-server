@@ -34,7 +34,15 @@ class User
             $query = 'INSERT INTO ' . $this->table . ' (name, email, avatar, interests, bio, createdAt) VALUES ( ?, ?, ?, ?, ?, ?)';
             $stmt = $this->conn->prepare($query);
             $stmt->execute([$userData['name'], $userData['email'], $userData['avatar'], $userData['interests'], $userData['bio'], $userData['createdAt']]);
-            return $stmt;
+            if ($stmt) {
+                // update username with id
+                $query = 'UPDATE ' . $this->table . ' SET username = ? WHERE email = ?';
+                $newstmt = $this->conn->prepare($query);
+                $newstmt->execute([strtolower(str_replace(' ', '', $userData['name'])) . '_' . $this->conn->lastInsertId(), $userData['email']]);
+                return $newstmt;
+            } else {
+                return false;
+            }
         } catch (PDOException $e) {
             echo ResponseHandler::sendResponse(500, $e->getMessage());
             return;
@@ -77,6 +85,38 @@ class User
             return $user;
         } else {
             return false;
+        }
+    }
+
+    public function followUser($userId, $userToFollowId, $date)
+    {
+        try {
+            $query = 'INSERT INTO followers (follower_id, following_id, createdAt) VALUES (?, ?, ?)';
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$userId, $userToFollowId, $date]);
+            return $stmt;
+        } catch (PDOException $e) {
+            // check if error is duplicate entry
+            if ($e->getCode() == 23000) {
+                $result = $this->unfollowUser($userId, $userToFollowId);
+                return $result;
+            } else {
+                echo ResponseHandler::sendResponse(500, $e->getMessage());
+                return;
+            }
+        }
+    }
+
+    public function unfollowUser($userId, $userToUnfollowId)
+    {
+        try {
+            $query = 'DELETE FROM followers WHERE follower_id = ? AND following_id = ?';
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$userId, $userToUnfollowId]);
+            return $stmt;
+        } catch (PDOException $e) {
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return;
         }
     }
 }
