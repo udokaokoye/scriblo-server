@@ -132,6 +132,44 @@ class Post
         }
     }
 
+    public function getUserPosts($method, $identifier)
+    {
+
+        if ($method == 'username') {
+            try {
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+                FROM posts
+                JOIN users u ON posts.authorId = u.id
+                WHERE u.username = ? ORDER BY posts.createdAt DESC";
+                // Prepare statement
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(1, $identifier);
+                $stmt->execute();
+
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                echo ResponseHandler::sendResponse(500, $e->getMessage());
+                return;
+            }
+        } else if ($method == 'id') {
+            try {
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+                FROM posts
+                JOIN users u ON posts.authorId = u.id
+                WHERE u.id = ? ORDER BY posts.createdAt DESC";
+                // Prepare statement
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(1, $identifier);
+                $stmt->execute();
+
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                echo ResponseHandler::sendResponse(500, $e->getMessage());
+                return;
+            }
+        } 
+    }
+
     public function getPost($slug)
     {
         try {

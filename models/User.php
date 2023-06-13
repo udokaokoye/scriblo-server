@@ -63,6 +63,20 @@ class User
         }
             
     }
+    public function getUserWithUsername($username)
+    {
+        // Code to fetch a single user from the database
+        $query = 'SELECT * FROM ' . $this->table . ' WHERE username = ?';
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($user) {
+            return $user;
+        } else {
+            return false;
+        }
+            
+    }
 
     public function updateUser($id, $userData)
     {
@@ -119,4 +133,53 @@ class User
             return;
         }
     }
+
+    public function getFollowers($userId)
+    {
+        try {
+            $query = 'SELECT * FROM followers WHERE following_id = ?';
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$userId]);
+            $followers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $followers;
+        } catch (PDOException $e) {
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return;
+        }
+    }
+
+    public function getFollowing($userId)
+    {
+        try {
+            $query = "SELECT 
+            CASE 
+                WHEN f.follower_id = :userID THEN f.following_id 
+                WHEN f.following_id = :userID THEN f.follower_id 
+            END AS user_id,
+            CASE 
+                WHEN f.follower_id = :userID THEN 'follower' 
+                WHEN f.following_id = :userID THEN 'following' 
+            END AS relationship,
+            u.*
+        FROM 
+            followers f
+        JOIN
+            users u ON u.id = CASE
+                WHEN f.follower_id = :userID THEN f.following_id
+                WHEN f.following_id = :userID THEN f.follower_id
+            END
+        WHERE
+            f.follower_id = :userID OR f.following_id = :userID";
+            $statement = $this->conn->prepare($query);
+            $statement->bindParam(':userID', $userId, PDO::PARAM_INT);
+            $statement->execute();
+            $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+            return $results;
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return;
+        }
+    }
+
+    
 }

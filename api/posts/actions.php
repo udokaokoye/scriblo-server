@@ -70,6 +70,11 @@ if ($method == 'GET') {
         $result = $post->getBookmarks($userId);
     }
 
+    if ($dataToGet == 'posts_username') {
+        $username = $_GET['username'];
+        $result = $post->getUserPosts('username', $username);
+    }
+
     if ($result) {
         echo ResponseHandler::sendResponse(200, null, $result);
     } else {
