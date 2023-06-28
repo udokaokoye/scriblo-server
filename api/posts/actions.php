@@ -35,6 +35,10 @@ if ($method == 'POST') {
         $result = $post->bookmarkPost($_POST['postId'], $_POST['userId'], $_POST['date']);
     }
 
+    if ($action == 'deletecomment') {
+        $result = $post->deleteComment($_POST['commentId']);
+    }
+
     if ($result) {
         echo ResponseHandler::sendResponse(200, 'Action Performed');
     } else {
@@ -80,30 +84,32 @@ if ($method == 'GET') {
     } else {
         echo ResponseHandler::sendResponse(200, 'No data found');
     }
-} else if($method == 'DELETE') {
-    if (!isset($_GET['data']) || !isset($_GET['id'])) {
-        echo ResponseHandler::sendResponse(400, 'Data and Id is required');
-        return;
-    }
+} 
+// else if($method == "DELETE") {
+//     if (!isset($_GET['data']) || !isset($_GET['id'])) {
+//         echo ResponseHandler::sendResponse(400, 'Data and Id is required');
+//         return;
+//     }
 
 
-    $database = new Database();
-    $db = $database->connect();
-    $post = new Post($db);
-    $result = null;
+//     $database = new Database();
+//     $db = $database->connect();
+//     $post = new Post($db);
+//     $result = null;
 
-    $dataToDelete = $_GET['data'];
-    $idToDelete = $_GET['id'];
+//     $dataToDelete = $_GET['data'];
+//     $idToDelete = $_GET['id'];
 
-    if ($dataToDelete == 'comment') {
-        $result = $post->deleteComment($idToDelete);
-    }
-    if ($result) {
-        echo ResponseHandler::sendResponse(200, 'Delete Successful');
-    } else {
-        echo ResponseHandler::sendResponse(400, 'Could not delete data');
-        return;
-    }
-} else {
+//     if ($dataToDelete == 'comment') {
+//         $result = $post->deleteComment($idToDelete);
+//     }
+//     if ($result) {
+//         echo ResponseHandler::sendResponse(200, 'Delete Successful');
+//     } else {
+//         echo ResponseHandler::sendResponse(400, 'Could not delete data');
+//         return;
+//     }
+// } 
+else {
     echo ResponseHandler::sendResponse(400, 'Invalid request');
 }

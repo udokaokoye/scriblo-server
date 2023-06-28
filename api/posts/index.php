@@ -31,9 +31,9 @@ if ($method == 'POST') {
     $postAdded = $post->addPost($_POST);
 
     if ($postAdded) {
-        echo ResponseHandler::sendResponse(200, 'Post added');
+        echo ResponseHandler::sendResponse(200, $postAdded);
     } else {
-        echo ResponseHandler::sendResponse(400, 'Post not added');
+        echo ResponseHandler::sendResponse(400, $postAdded);
     }
 } 
 if($method == 'GET') {

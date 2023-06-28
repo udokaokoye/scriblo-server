@@ -29,7 +29,7 @@ if ($method == 'POST') {
     }
 
     if ($result) {
-        echo ResponseHandler::sendResponse(200, 'Action Performed');
+        echo ResponseHandler::sendResponse(200, $result);
     } else {
         echo ResponseHandler::sendResponse(400, 'Could not perform action');
     }
@@ -52,15 +52,7 @@ if ($method == 'GET') {
         $result = $user->getUserWithUsername($_GET['username']);
     }
 
-    // if ($action == 'getFollows') {
-    //     $result = $user->getFollows($_GET['userId']);
-    // }
-
-    // if ($action == 'getFollowers') {
-    //     $result = $user->getFollowers($_GET['userId']);
-    // }
-
-    if ($action == 'getFollowing') {
+    if ($action == 'getUserFollows') {
         $following = [];
         $followers = [];
         $data = $user->getFollowing($_GET['userId']);
@@ -70,12 +62,12 @@ if ($method == 'GET') {
             $relationship = $dt['relationship'];
             $userDetails = array_slice($dt, 3); // Exclude the user_id and relationship fields
         
-            if ($relationship === 'follower') {
+            if ($relationship === 'following') {
                 $followers[] = [
                     'user_id' => $userID,
                     'user_details' => $userDetails
                 ];
-            } elseif ($relationship === 'following') {
+            } elseif ($relationship === 'follower') {
                 $following[] = [
                     'user_id' => $userID,
                     'user_details' => $userDetails

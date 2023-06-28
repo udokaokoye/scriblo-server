@@ -20,7 +20,7 @@ class Post
     public $isHidden;
     public $createdAt;
     public $mediaFiles;
-
+    public $authorUsername;
     // Constructor with DB
     public function __construct($db)
     {
@@ -49,6 +49,7 @@ class Post
             $this->tagsIDs = htmlspecialchars(strip_tags($postData['tagsIDs']));
             $this->coverImage = htmlspecialchars(strip_tags($postData['coverImage']));
             $this->summary = htmlspecialchars(strip_tags($postData['summary']));
+            $this->authorUsername = htmlspecialchars(strip_tags($postData['username']));
             // Bind data
             $stmt->bindParam(1, $this->slug);
             $stmt->bindParam(2, $this->authorId);
@@ -66,20 +67,26 @@ class Post
 
             // Execute query
             if ($stmt->execute()) {
+                $lastId = $this->conn->lastInsertId();
 
                 if ($this->isHidden == 0) {
-                    $this->updatePostTagRelationshipTable($this->conn->lastInsertId());
+                    $this->updatePostTagRelationshipTable($lastId);
                     // return true;
                 }
                 // query update slug with id
-                $upadatedSlug = $this->slug . '-' . $this->conn->lastInsertId();
+                $upadatedSlug = '';
+                if ($this->isHidden == 0) {
+                    $upadatedSlug = $this->slug . '-' . $lastId;
+                } else {
+                    $upadatedSlug = $this->authorUsername . '-' . $lastId;
+                }
                 $query = "UPDATE posts SET slug = ? WHERE id = ?";
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(1, $upadatedSlug);
-                $stmt->bindParam(2, $this->conn->lastInsertId());
+                $stmt->bindParam(2, $lastId);
                 $stmt->execute();
 
-                return true;
+                return $lastId;
             }
         } catch (Exception $e) {
             echo ResponseHandler::sendResponse(500, $e->getMessage());
@@ -294,7 +301,6 @@ class Post
             foreach ($tags as $tag) {
                 $stmt->execute([$postId, $tag]);
             }
-            return true;
         } catch (Exception $e) {
             echo ResponseHandler::sendResponse(500, $e->getMessage());
             return;

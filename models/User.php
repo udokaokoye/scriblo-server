@@ -108,12 +108,12 @@ class User
             $query = 'INSERT INTO followers (follower_id, following_id, createdAt) VALUES (?, ?, ?)';
             $stmt = $this->conn->prepare($query);
             $stmt->execute([$userId, $userToFollowId, $date]);
-            return $stmt;
+            return 'followed';
         } catch (PDOException $e) {
             // check if error is duplicate entry
             if ($e->getCode() == 23000) {
                 $result = $this->unfollowUser($userId, $userToFollowId);
-                return $result;
+                return 'unfollowed';
             } else {
                 echo ResponseHandler::sendResponse(500, $e->getMessage());
                 return;
