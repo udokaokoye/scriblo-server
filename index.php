@@ -2,6 +2,7 @@
 include_once './config/database.php';
 include_once './utils/JwtUtility.php';
 include_once './utils/ResponseHandler.php';
+include_once './utils/Crypt.php';
 // $requestUri = $_SERVER['REQUEST_URI'];
 // $requestMethod = $_SERVER['REQUEST_METHOD'];
 
@@ -16,4 +17,16 @@ include_once './utils/ResponseHandler.php';
 // }
 // JwtUtility::verifyHttpAuthorization();
 
-echo ResponseHandler::sendResponse(200, 'User retrieved successfully');
+$originalData = "Hello, this is a secret message!";
+$encryptionKey = "YourEncryptionKey"; // Replace this with a secure encryption key
+
+// Encrypt the data
+$encryptedData = Crypt::encrypt($originalData);
+
+// Decrypt the data
+$decryptedData = Crypt::decrypt($encryptedData);
+
+// Output results
+echo "Original Data: " . $originalData . "<br>";
+echo "Encrypted Data: " . $encryptedData . "<br>";
+echo "Decrypted Data: " . $decryptedData . "<br>";

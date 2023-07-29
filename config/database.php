@@ -3,9 +3,13 @@
  ini_set('display_startup_errors', 1); 
  error_reporting(E_ALL);
 
-header( 'Access-Control-Allow-Origin: *' );
-header( 'Access-Control-Allow-Methods: *' );
-header( 'Access-Control-Allow-Headers: *' );
+ header('Access-Control-Allow-Origin: *');
+
+ // Allow specific headers
+ header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization');
+ 
+ // Allow specific HTTP methods
+ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 
 class Database {
     // DB Params

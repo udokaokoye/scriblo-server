@@ -3,6 +3,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../utils/ResponseHandler.php';
+// require_once __DIR__ . '/../config/database.php';
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -50,9 +51,12 @@ class JwtUtility
         }
     }
 
-    public static function verifyHttpAuthorization()
+    public static function verifyHttpAuthorization($fallbackToken)
     {
         $receivedToken = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+        if ($receivedToken == "" || $receivedToken == null) {
+            $receivedToken = $fallbackToken;
+        }
 
         if (!$receivedToken) {
             // Token not provided

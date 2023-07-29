@@ -7,13 +7,13 @@ include_once '../../utils/JwtUtility.php';
 
 
 
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 
+// JwtUtility::verifyHttpAuthorization();
 if ($method == 'POST') {
-    JwtUtility::verifyHttpAuthorization();
-    // ResponseHandler::sendResponse(200, 'Post added');
-    // return;
+    JwtUtility::verifyHttpAuthorization($_POST['authToken'] ?? null);
 
     $database = new Database();
     $db = $database->connect();
@@ -35,8 +35,8 @@ if ($method == 'POST') {
     } else {
         echo ResponseHandler::sendResponse(400, $postAdded);
     }
-} 
-if($method == 'GET') {
+}
+if ($method == 'GET') {
     // JwtUtility::verifyHttpAuthorization();
     $database = new Database();
     $db = $database->connect();
@@ -46,22 +46,26 @@ if($method == 'GET') {
 
     if (isset($_GET['categories'])) {
         $posts = $post->getPosts($_GET['categories']);
-    } 
+    }
     if (isset($_GET['search']) && isset($_GET['class'])) {
         $posts = $post->searchPosts($_GET['search'], $_GET['class']);
-    } 
+    }
 
     if (isset($_GET['slug'])) {
         $posts = $post->getPost($_GET['slug']);
     }
-    
+
+    if (isset($_GET['articleId'])) {
+        $posts = $post->getPostById($_GET['articleId']);
+    }
+
 
     if ($posts) {
         echo ResponseHandler::sendResponse(200, null, $posts);
     } else {
         echo ResponseHandler::sendResponse(200, 'No posts found');
     }
-} 
+}
 // if($method == 'DELETE') {
 //     JwtUtility::verifyHttpAuthorization();
 
@@ -83,26 +87,28 @@ if($method == 'GET') {
 //         echo ResponseHandler::sendResponse(400, 'Post not deleted');
 //     }
 // } 
-if($method == 'PATCH') {
-    JwtUtility::verifyHttpAuthorization();
+if ($method == 'PATCH') {
+    JwtUtility::verifyHttpAuthorization($_POST['authToken'] ?? null);
 
     $database = new Database();
     $db = $database->connect();
 
     $post = new Post($db);
 
-    if (!isset($_POST['id']) || !isset($_POST['title']) || !isset($_POST['content']) || !isset($_POST['authorId']) || !isset($_POST['slug'])) {
-        echo ResponseHandler::sendResponse(400, 'Id, title, slug, content and author are required');
-        return;
-    }
 
-    $postUpdated = $post->updatePost($_POST);
+        if (!isset($jsonData['id']) || !isset($jsonData['title']) || !isset($jsonData['content']) || !isset($jsonData['authorId'])) {
+            echo ResponseHandler::sendResponse(400, 'Id, title, content and author are required');
+            return;
+        }
 
-    if ($postUpdated) {
-        echo ResponseHandler::sendResponse(200, 'Post updated');
-    } else {
-        echo ResponseHandler::sendResponse(400, 'Post not updated');
-    }
+        $postUpdated = $post->updatePost($jsonData);
+
+        if ($postUpdated) {
+            echo ResponseHandler::sendResponse(200, 'Post updated');
+        } else {
+            echo ResponseHandler::sendResponse(400, 'Post not updated');
+        }
+
 } 
 
 // echo ResponseHandler::sendResponse(405, 'Method not allowed');
