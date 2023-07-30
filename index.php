@@ -33,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div class='container'>
-      <img src='https://scriblo.s3.us-east-2.amazonaws.com/branding/Vector.png' alt='brand logo' />
-    <h3>Hey There 👋 thank You for Joining the Waitlist! </h3>
+      <img src='https://scriblo.s3.us-east-2.amazonaws.com/branding/brand_logo_black.png' alt='brand logo' />
+    <h3>Hey There 👋 Thank You for Joining the Waitlist! </h3>
       
         <p>We appreciate your interest in our application. You are now on our waitlist, and we're excited to have you onboard. Be the first to experience our powerful blogging platform that empowers writers like you to share their ideas with the world.</p>
       
