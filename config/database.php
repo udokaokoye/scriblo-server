@@ -24,6 +24,13 @@ class Database {
     private $dbname = "scriblo";
 
 
+    // private $servername = "localhost";
+    // private $username = "u896018919_preProdScriblo";
+    // private $password = "f6[peCfF";
+    // private $dbname = "u896018919_preProdScriblo";
+
+
+
     private $conn;
 
     // DB Connect

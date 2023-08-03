@@ -1,5 +1,5 @@
 <?php
-include_once '../../config/Database.php';
+include_once '../../config/database.php';
 include_once '../../models/User.php';
 include_once '../../utils/ResponseHandler.php';
 include_once '../../utils/TokenGenerator.php';
@@ -20,6 +20,61 @@ if ($method === 'POST') {
     $token = 12345;
     $hashedToken = password_hash($token, PASSWORD_DEFAULT);
     $currentDateTime = new DateTime();
+    $tokenMessage = "
+    <html>
+<head>
+    <title>Welcome | Scriblo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+		.container img {
+			margin: 0 auto;
+		}
+		.code {
+		    font-weight: bolder;
+			font-size: 35px;
+			text-align: center;
+			letter-spacing: 10px;
+		}
+        h1 {
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+    <div class='container'>
+      <img src='https://scriblo.s3.us-east-2.amazonaws.com/branding/brand_logo_black.png' alt='brand logo' />
+    <h3 style='text-align: center'>Hey There 👋 Thank You for Choosing Scriblo! </h3>
+      
+        <p>We are excited to have you on board. To ensure the security of your account, we require you to complete the verification process by confirming your email address.</p>
+			<p class='code'>$token<p>
+      <p>Please note that the token is valid for a limited time only. If you don't verify your email within 15 minutes, you may need to request a new token.
+
+				If you did not create an account on our platform, please ignore this email. Rest assured, your information remains safe.
+				
+				</p>
+      
+      <p> Thank you again for joining scriblo. We're thrilled to have you as part of our journey! </p>
+      
+      <p>Best regards, </br>
+Scriblo Team</p>
+  <img src='https://scriblo.s3.us-east-2.amazonaws.com/branding/brandLogo_black.png' alt='brand logo' width='10%' />
+  
+    </div>
+</body>
+</html>
+    ";
 
     // check if there is already a token for this user
     $query = 'SELECT token FROM tokens WHERE email = ?';
@@ -44,7 +99,7 @@ if ($method === 'POST') {
     $stmt = $db->prepare($query);
     $stmt->execute([$hashedToken, $_POST['email'], $expirationDate]); // $_POST['email'] is the email of the user who is requesting a token
     if ($stmt) {
-        $emailSent = EmailClient::sendEmail($_POST['email'], 'Scriblo - Your 5 digit verification token', 'Your token is ' . $token, ' hello@scriblo.com', ', Scriblo');
+        $emailSent = EmailClient::sendEmail($_POST['email'], 'Scriblo - Your 5 digit verification token', $tokenMessage, 'hello@scriblo.com', 'Scriblo');
         if ($emailSent) {
             echo ResponseHandler::sendResponse(200, 'Token sent');
             return;
