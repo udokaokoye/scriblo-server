@@ -234,6 +234,7 @@ class Post
 
     public function searchPosts($searchQuery, $class)
     {
+        $searchQuery = preg_replace('/[^a-zA-Z0-9]/', '', $searchQuery);
         if ($class == 'articles') {
             try {
                 $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
@@ -241,11 +242,13 @@ class Post
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id
                 JOIN tags ON post_tags.tagId = tags.id
-                WHERE posts.title LIKE '%$searchQuery%' OR 
-                posts.slug LIKE '%$searchQuery%' OR 
-                tags.name LIKE '%$searchQuery%' ORDER BY posts.createdAt DESC";
+                WHERE posts.title LIKE :query OR 
+                posts.slug LIKE :query OR 
+                tags.name LIKE :query  ORDER BY posts.createdAt DESC";
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
+                $searchQuery = '%' . $searchQuery . '%';
+                $stmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
                 $stmt->execute();
 
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -255,9 +258,12 @@ class Post
             }
         } else if ($class == 'people') {
             try {
-                $query = "SELECT * FROM users WHERE name LIKE '%$searchQuery%' OR email ORDER BY createdAt DESC";
+                $query = "SELECT * FROM users WHERE name LIKE :query OR email ORDER BY createdAt DESC";
+                
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
+                $searchQuery = '%' . $searchQuery . '%';
+                $stmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
                 $stmt->execute();
 
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
