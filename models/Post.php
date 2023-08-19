@@ -561,4 +561,38 @@ class Post
         $stmt->execute([$slug]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-}
+
+    public function pinPost ($postID) {
+        try {
+            $query = "UPDATE `posts` SET `pinned` = 'true' WHERE `id` = ? ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $postID);
+        
+        if ($stmt->execute()) {
+            return true;
+        }
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(400, $e->getMessage());
+            return;
+        }
+
+    }
+
+    public function unpinPost ($postID) {
+        try {
+            $query = "UPDATE `posts` SET `pinned` = 'false' WHERE `id` = ? ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $postID);
+        
+        if ($stmt->execute()) {
+            return true;
+        }
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(400, $e->getMessage());
+            return;
+        }
+
+    }
+ }

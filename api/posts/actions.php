@@ -58,6 +58,18 @@ if ($method == 'POST') {
         JwtUtility::verifyHttpAuthorization($_POST['authToken'] ?? null);
         $result = $post->deletePost($_POST['postId']);
     }
+    
+    if ($action == 'pinPost') {
+        // JwtUtility::verifyHttpAuthorization($_POST['authToken'] ?? null);
+        $result = $post->pinPost($_POST['postId']);
+        
+    }
+
+    if ($action == 'unpinPost') {
+        // JwtUtility::verifyHttpAuthorization($_POST['authToken'] ?? null);
+        $result = $post->unpinPost($_POST['postId']);
+        
+    }
 
 
 
