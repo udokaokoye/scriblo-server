@@ -61,7 +61,6 @@ class User
         } else {
             return false;
         }
-            
     }
     public function getUserWithUsername($username)
     {
@@ -75,12 +74,19 @@ class User
         } else {
             return false;
         }
-            
     }
 
-    public function updateUser($id, $userData)
+    public function updateProfile($id, $userData)
     {
-        // Code to update a user in the database
+        // update name,username,avatar,allowEmails,interests,bio,coverImage,url
+        $query = 'UPDATE ' . $this->table . ' SET name = ?, username = ?, avatar = ?, allowEmails = ?, bio = ?, url = ? WHERE id = ?';
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$userData['name'], $userData['username'], $userData['avatar'], $userData['allowEmails'], $userData['bio'], $userData['url'], $id]);
+        if ($stmt) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function deleteUser($id)
@@ -180,6 +186,4 @@ class User
             return;
         }
     }
-
-    
 }

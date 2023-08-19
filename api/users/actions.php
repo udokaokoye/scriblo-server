@@ -28,6 +28,10 @@ if ($method == 'POST') {
         $result = $user->unfollowUser($_POST['userId'], $_POST['unfollowId']);
     }
 
+    if ($action == 'updateProfile') {
+        $result = $user->updateProfile($_POST['userId'], $_POST);
+    }
+
     if ($result) {
         echo ResponseHandler::sendResponse(200, $result);
     } else {

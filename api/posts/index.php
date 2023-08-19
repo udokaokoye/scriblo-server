@@ -47,7 +47,7 @@ if ($method == 'GET') {
 
     if (isset($_GET['categories'])) {
         $posts = $post->getPosts($_GET['categories']);
-        $relevantPosts = FeedAlgorithim::rankPosts($posts);
+        // $relevantPosts = FeedAlgorithim::rankPosts($posts);
     }
     if (isset($_GET['search']) && isset($_GET['class'])) {
         $posts = $post->searchPosts($_GET['search'], $_GET['class']);
