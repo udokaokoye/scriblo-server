@@ -7,6 +7,7 @@ include_once '../../config/database.php';
 include_once '../../models/User.php';
 include_once '../../utils/ResponseHandler.php';
 include_once '../../utils/JwtUtility.php';
+include_once '../../utils/sendWelcomeEmail.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -63,6 +64,7 @@ if ($method == 'GET') {
     }
     $token = JwtUtility::generateToken(["email" => $_POST["email"]], "+5 minutes");
     echo ResponseHandler::sendResponse(200, 'User added successfully', null, $token);
+    sendWelcomeEmail($db, $_POST["email"]);
 }else {
     echo json_encode(['error' => 'Method not allowed']);
 }

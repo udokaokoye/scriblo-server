@@ -118,7 +118,7 @@ class Post
 
         if (isset($categories) && $categories != 'all') {
             try {
-                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id
@@ -135,7 +135,7 @@ class Post
             }
         } else {
             try {
-                $query = " SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+                $query = " SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id ORDER BY posts.createdAt DESC
@@ -157,7 +157,7 @@ class Post
 
         if ($method == 'username') {
             try {
-                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar, pr.slug AS previewSlug, pr.code AS previewCode 
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar, pr.slug AS previewSlug, pr.code AS previewCode 
                 FROM posts
                 JOIN users u ON posts.authorId = u.id
                 LEFT JOIN previews pr ON posts.id = pr.postId
@@ -174,7 +174,7 @@ class Post
             }
         } else if ($method == 'id') {
             try {
-                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar, pr.slug AS previewSlug, pr.code AS previewCode 
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar, pr.slug AS previewSlug, pr.code AS previewCode 
                 FROM posts
                 JOIN users u ON posts.authorId = u.id
                 LEFT JOIN previews pr ON posts.authorId = pr.authorId
@@ -195,7 +195,7 @@ class Post
     public function getPost($slug)
     {
         try {
-            $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.bio AS authorBio, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+            $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.bio AS authorBio, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
             FROM posts
             -- JOIN post_tags ON posts.id = post_tags.postId
             JOIN users u ON posts.authorId = u.id
@@ -215,7 +215,7 @@ class Post
     public function getPostById($articleId)
     {
         try {
-            $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.bio AS authorBio, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+            $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.bio AS authorBio, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
             FROM posts
             -- JOIN post_tags ON posts.id = post_tags.postId
             JOIN users u ON posts.authorId = u.id
@@ -234,18 +234,21 @@ class Post
 
     public function searchPosts($searchQuery, $class)
     {
+        $searchQuery = preg_replace('/[^a-zA-Z0-9]/', '', $searchQuery);
         if ($class == 'articles') {
             try {
-                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
+                $query = "SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id
                 JOIN tags ON post_tags.tagId = tags.id
-                WHERE posts.title LIKE '%$searchQuery%' OR 
-                posts.slug LIKE '%$searchQuery%' OR 
-                tags.name LIKE '%$searchQuery%' ORDER BY posts.createdAt DESC";
+                WHERE posts.title LIKE :query OR 
+                posts.slug LIKE :query OR 
+                tags.name LIKE :query  ORDER BY posts.createdAt DESC";
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
+                $searchQuery = '%' . $searchQuery . '%';
+                $stmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
                 $stmt->execute();
 
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -255,9 +258,12 @@ class Post
             }
         } else if ($class == 'people') {
             try {
-                $query = "SELECT * FROM users WHERE name LIKE '%$searchQuery%' OR email ORDER BY createdAt DESC";
+                $query = "SELECT * FROM users WHERE name LIKE :query OR email ORDER BY createdAt DESC";
+                
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
+                $searchQuery = '%' . $searchQuery . '%';
+                $stmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
                 $stmt->execute();
 
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -321,6 +327,13 @@ class Post
                 if ($this->isHidden == 0) {
                     $this->deletePostTagRelationshipTable($id);
                     $this->updatePostTagRelationshipTable($id, $postData['tagsIDs']);
+                    $upadatedSlug = '';
+                    $upadatedSlug = $this->slug . '-' . $id;
+                    $query = "UPDATE posts SET slug = ? WHERE id = ?";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->bindParam(1, $upadatedSlug);
+                    $stmt->bindParam(2, $id);
+                    $stmt->execute();
                     return true;
                 }
 
@@ -438,7 +451,7 @@ class Post
     public function getCommnets($postID)
     {
         try {
-            $query = "SELECT comments.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar  FROM `comments` JOIN users u ON comments.userID = u.id WHERE comments.postId = '$postID' ORDER BY comments.createdAt DESC ";
+            $query = "SELECT comments.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar  FROM `comments` JOIN users u ON comments.userID = u.id WHERE comments.postId = '$postID' ORDER BY comments.createdAt DESC ";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -548,4 +561,38 @@ class Post
         $stmt->execute([$slug]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-}
+
+    public function pinPost ($postID) {
+        try {
+            $query = "UPDATE `posts` SET `pinned` = 'true' WHERE `id` = ? ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $postID);
+        
+        if ($stmt->execute()) {
+            return true;
+        }
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(400, $e->getMessage());
+            return;
+        }
+
+    }
+
+    public function unpinPost ($postID) {
+        try {
+            $query = "UPDATE `posts` SET `pinned` = 'false' WHERE `id` = ? ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $postID);
+        
+        if ($stmt->execute()) {
+            return true;
+        }
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(400, $e->getMessage());
+            return;
+        }
+
+    }
+ }

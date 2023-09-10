@@ -1,6 +1,6 @@
 <?php
 // verify token
-include_once '../../config/Database.php';
+include_once '../../config/database.php';
 include_once '../../models/User.php';
 include_once '../../utils/ResponseHandler.php';
 include_once '../../utils/TokenGenerator.php';

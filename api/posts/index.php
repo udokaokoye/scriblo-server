@@ -4,6 +4,7 @@ include_once '../../config/database.php';
 include_once '../../models/Post.php';
 include_once '../../utils/ResponseHandler.php';
 include_once '../../utils/JwtUtility.php';
+include_once '../../utils/Algorithim.php';
 
 
 
@@ -46,6 +47,7 @@ if ($method == 'GET') {
 
     if (isset($_GET['categories'])) {
         $posts = $post->getPosts($_GET['categories']);
+        // $relevantPosts = FeedAlgorithim::rankPosts($posts);
     }
     if (isset($_GET['search']) && isset($_GET['class'])) {
         $posts = $post->searchPosts($_GET['search'], $_GET['class']);
