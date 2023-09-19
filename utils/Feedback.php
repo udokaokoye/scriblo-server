@@ -16,12 +16,13 @@ if ($method == 'POST') {
     $feedbackProblem = $_POST['problem'];
     $feedbackReproduction = $_POST['reproduction'];
     $feedbackDate = $_POST['date'];
+    $feedbackEmail = $_POST['email'];
 
 
 
-    $query = "INSERT INTO feedbacks (`type`, `page`, `problem`, `reproduction`, `created_at`) VALUES (?, ?, ?, ? ,?)";
+    $query = "INSERT INTO feedbacks (`email`, `type`, `page`, `problem`, `reproduction`, `created_at`) VALUES (?, ?, ?, ?, ? ,?)";
     $stmt = $db->prepare($query);
-    $stmt->execute([$feedbackType, $feedbackPage, $feedbackProblem, $feedbackReproduction, $feedbackDate]);
+    $stmt->execute([$feedbackEmail, $feedbackType, $feedbackPage, $feedbackProblem, $feedbackReproduction, $feedbackDate]);
 
     if ($stmt) {
         echo ResponseHandler::sendResponse(200, "Feedback received");
