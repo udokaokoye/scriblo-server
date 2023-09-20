@@ -1,6 +1,6 @@
 <?php
-include_once '../../utils/ResponseHandler.php';
-include_once '../../utils/EmailClient.php';
+include_once './ResponseHandler.php';
+include_once './EmailClient.php';
 include_once '../../config/database.php';
 
 // $database = new Database();

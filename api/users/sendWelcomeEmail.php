@@ -7,11 +7,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method == "POST") {
     $database = new Database();
     $db = $database->connect();
-    $userID= $_POST['userId'];
+    $email= $_POST['email'];
 
-    $query = "SELECT * FROM users WHERE id=?";
+    $query = "SELECT * FROM users WHERE email=?";
     $stmt = $db->prepare($query);
-    $stmt->execute([$userID]);
+    $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
