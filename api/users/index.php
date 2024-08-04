@@ -7,7 +7,7 @@ include_once '../../config/database.php';
 include_once '../../models/User.php';
 include_once '../../utils/ResponseHandler.php';
 include_once '../../utils/JwtUtility.php';
-include_once '../../utils/sendWelcomeEmail.php';
+// include_once '../../utils/sendWelcomeEmail.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
