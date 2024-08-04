@@ -17,16 +17,19 @@ include_once './utils/Crypt.php';
 // }
 // JwtUtility::verifyHttpAuthorization();
 
-$originalData = "Hello, this is a secret message!";
-$encryptionKey = "YourEncryptionKey"; // Replace this with a secure encryption key
+// $originalData = "Hello, this is a secret message!";
+// $encryptionKey = "YourEncryptionKey"; // Replace this with a secure encryption key
 
-// Encrypt the data
-$encryptedData = Crypt::encrypt($originalData);
+// // Encrypt the data
+// $encryptedData = Crypt::encrypt($originalData);
 
-// Decrypt the data
-$decryptedData = Crypt::decrypt($encryptedData);
+// // Decrypt the data
+// $decryptedData = Crypt::decrypt($encryptedData);
 
-// Output results
-echo "Original Data: " . $originalData . "<br>";
-echo "Encrypted Data: " . $encryptedData . "<br>";
-echo "Decrypted Data: " . $decryptedData . "<br>";
+// // Output results
+// echo "Original Data: " . $originalData . "<br>";
+// echo "Encrypted Data: " . $encryptedData . "<br>";
+// echo "Decrypted Data: " . $decryptedData . "<br>";
+
+
+echo "Hello World";
