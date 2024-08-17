@@ -18,16 +18,16 @@ class Database {
     // private $password = "2P=u>3LQ*S@N";
     // private $dbname = "u896018919_scriblo";
 
-    private $servername = "localhost";
-    private $username = "root";
-    private $password = "";
-    private $dbname = "scriblo";
-
-
     // private $servername = "localhost";
-    // private $username = "u896018919_preProdScriblo";
-    // private $password = "f6[peCfF";
-    // private $dbname = "u896018919_preProdScriblo";
+    // private $username = "root";
+    // private $password = "";
+    // private $dbname = "scriblo";
+
+
+    private $servername = "localhost";
+    private $username = "u896018919_preProdScriblo";
+    private $password = "f6[peCfF";
+    private $dbname = "u896018919_preProdScriblo";
 
 
 
