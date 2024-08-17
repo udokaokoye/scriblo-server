@@ -41,7 +41,8 @@ class User
                 $newstmt->execute([strtolower(str_replace(' ', '', $userData['name'])) . '_' . $this->conn->lastInsertId(), $userData['email']]);
                 return $newstmt;
             } else {
-                return false;
+                echo ResponseHandler::sendResponse(500, "ERROR");
+                return;
             }
         } catch (PDOException $e) {
             echo ResponseHandler::sendResponse(500, $e->getMessage());
@@ -184,6 +185,25 @@ class User
         } catch (Exception $e) {
             echo ResponseHandler::sendResponse(500, $e->getMessage());
             return;
+        }
+    }
+
+
+    public function subscribeToNewsLetter($email)
+    {
+        try {
+            $query = "INSERT INTO `subscriptions` (email) VALUES (?) ";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$email]);
+            return 'Thanks for subscribing!';
+        } catch (PDOException $e) {
+            // check if error is duplicate entry
+            if ($e->getCode() == 23000) {
+                return 'Aww! You already subscribed.';
+            } else {
+                echo ResponseHandler::sendResponse(500, $e->getMessage());
+                return;
+            }
         }
     }
 }
