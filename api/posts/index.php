@@ -5,6 +5,7 @@ include_once '../../models/Post.php';
 include_once '../../utils/ResponseHandler.php';
 include_once '../../utils/JwtUtility.php';
 include_once '../../utils/Algorithim.php';
+include_once '../../utils/TrendingAlgorithim.php';
 
 
 
@@ -59,6 +60,11 @@ if ($method == 'GET') {
 
     if (isset($_GET['articleId'])) {
         $posts = $post->getPostById($_GET['articleId']);
+    }
+
+    if(isset($_GET['trending'])) {
+        $posts = $post->getTrendingPosts();
+        $posts = TrendingAlgorithim::rankPosts($posts);
     }
 
 

@@ -56,15 +56,18 @@ if ($method == 'GET') {
         echo ResponseHandler::sendResponse(400, 'User already exists');
         return;
     }
+
     $userAdded = $user->addUser($_POST);
 
     if (!$userAdded) {
         echo ResponseHandler::sendResponse(500, 'User could not be added');
         return;
     }
+
+    
     $token = JwtUtility::generateToken(["email" => $_POST["email"]], "+5 minutes");
     echo ResponseHandler::sendResponse(200, 'User added successfully', null, $token);
-    sendWelcomeEmail($db, $_POST["email"]);
+    // sendWelcomeEmail($db, $_POST["email"]);
 }else {
     echo json_encode(['error' => 'Method not allowed']);
 }

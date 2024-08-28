@@ -212,6 +212,35 @@ class Post
         }
     }
 
+    public function getTrendingPosts()
+    {
+        try {
+            $query = " SELECT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar, COUNT(DISTINCT l.id) AS likeCount, 
+    COUNT(DISTINCT c.id) AS commentCount
+            FROM posts
+            JOIN users u ON posts.authorId = u.id
+            LEFT JOIN likes l ON posts.id = l.postId
+            LEFT JOIN comments c ON posts.id = c.postId
+            GROUP BY 
+    posts.id, 
+    u.name, 
+    u.verified, 
+    u.username, 
+    u.email, 
+    u.avatar
+            ORDER BY posts.createdAt DESC
+            ";
+            // Prepare statement
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            echo ResponseHandler::sendResponse(500, $e->getMessage());
+            return;
+        }
+    }
+
     public function getPostById($articleId)
     {
         try {
@@ -259,7 +288,7 @@ class Post
         } else if ($class == 'people') {
             try {
                 $query = "SELECT * FROM users WHERE name LIKE :query OR email ORDER BY createdAt DESC";
-                
+
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
                 $searchQuery = '%' . $searchQuery . '%';
@@ -562,37 +591,37 @@ class Post
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function pinPost ($postID) {
+    public function pinPost($postID)
+    {
         try {
             $query = "UPDATE `posts` SET `pinned` = 'true' WHERE `id` = ? ";
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $postID);
-        
-        if ($stmt->execute()) {
-            return true;
-        }
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $postID);
+
+            if ($stmt->execute()) {
+                return true;
+            }
         } catch (Exception $e) {
             echo ResponseHandler::sendResponse(400, $e->getMessage());
             return;
         }
-
     }
 
-    public function unpinPost ($postID) {
+    public function unpinPost($postID)
+    {
         try {
             $query = "UPDATE `posts` SET `pinned` = 'false' WHERE `id` = ? ";
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $postID);
-        
-        if ($stmt->execute()) {
-            return true;
-        }
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $postID);
+
+            if ($stmt->execute()) {
+                return true;
+            }
         } catch (Exception $e) {
             echo ResponseHandler::sendResponse(400, $e->getMessage());
             return;
         }
-
     }
- }
+}

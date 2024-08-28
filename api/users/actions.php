@@ -32,6 +32,14 @@ if ($method == 'POST') {
         $result = $user->updateProfile($_POST['userId'], $_POST);
     }
 
+    if ($action == 'subscribe') {
+        if (!isset($_POST['email'])) {
+            echo ResponseHandler::sendResponse(400, "Email Required");
+            die();
+        }
+       $result = $user->subscribeToNewsLetter($_POST['email']);
+    }
+
     if ($result) {
         echo ResponseHandler::sendResponse(200, $result);
     } else {
