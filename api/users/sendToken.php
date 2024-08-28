@@ -16,8 +16,8 @@ if ($method === 'POST') {
     }
     $database = new Database();
     $db = $database->connect();
-    // $token = TokenGenerator::generateToken();
-    $token = 12345;
+    $token = TokenGenerator::generateToken();
+    // $token = 12345;
     $hashedToken = password_hash($token, PASSWORD_DEFAULT);
     $currentDateTime = new DateTime();
     $tokenMessage = "
