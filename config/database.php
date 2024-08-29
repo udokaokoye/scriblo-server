@@ -13,11 +13,11 @@
 
 class Database {
 
+
     private $servername = "localhost";
     private $username = "u896018919_scribloADMIN";
     private $password = "2P=u>3LQ*S@N";
     private $dbname = "u896018919_scriblo";
-
 
     // private $servername = "localhost";
     // private $username = "root";
