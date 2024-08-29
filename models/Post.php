@@ -38,9 +38,9 @@ class Post
             $stmt = $this->conn->prepare($query);
 
             // Clean data
-            $this->slug = htmlspecialchars(strip_tags($postData['slug']));
+            $this->slug = preg_replace('/[^a-zA-Z0-9]/', '-', $postData['slug']);
             $this->authorId = htmlspecialchars(strip_tags($postData['authorId']));
-            $this->title = htmlspecialchars(strip_tags($postData['title']));
+            $this->title = $postData['title'];
             $this->content = $postData['content'];
             $this->tags = htmlspecialchars(strip_tags($postData['tags']));
             $this->publishDate = htmlspecialchars(strip_tags($postData['publishDate']));
@@ -49,9 +49,9 @@ class Post
             $this->mediaFiles = serialize($postData['mediaFiles']);
             $this->tagsIDs = htmlspecialchars(strip_tags($postData['tagsIDs']));
             $this->coverImage = htmlspecialchars(strip_tags($postData['coverImage']));
-            $this->summary = htmlspecialchars(strip_tags($postData['summary']));
-            $this->authorUsername = htmlspecialchars(strip_tags($postData['username']));
-            $this->readTime = htmlspecialchars(strip_tags($postData['readTime']));
+            $this->summary = $postData['summary'];
+            $this->authorUsername = $postData['username'];
+            $this->readTime = $postData['readTime'];
             // Bind data
             $stmt->bindParam(1, $this->slug);
             $stmt->bindParam(2, $this->authorId);
@@ -216,19 +216,19 @@ class Post
     {
         try {
             $query = " SELECT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar, COUNT(DISTINCT l.id) AS likeCount, 
-    COUNT(DISTINCT c.id) AS commentCount
+            COUNT(DISTINCT c.id) AS commentCount
             FROM posts
             JOIN users u ON posts.authorId = u.id
             LEFT JOIN likes l ON posts.id = l.postId
             LEFT JOIN comments c ON posts.id = c.postId
             WHERE posts.isHidden = 0
             GROUP BY 
-    posts.id, 
-    u.name, 
-    u.verified, 
-    u.username, 
-    u.email, 
-    u.avatar
+            posts.id, 
+            u.name, 
+            u.verified, 
+            u.username, 
+            u.email, 
+            u.avatar
             ORDER BY posts.createdAt DESC
             ";
             // Prepare statement
@@ -332,14 +332,14 @@ class Post
             $stmt = $this->conn->prepare($query);
 
             // Clean data
-            $this->title = htmlspecialchars(strip_tags($postData['title']));
+            $this->title = $postData['title'];
             $this->content = $postData['content'];
-            $this->summary = htmlspecialchars(strip_tags($postData['summary']));
-            $this->slug = htmlspecialchars(strip_tags($postData['slug']));
+            $this->summary = $postData['summary'];
+            $this->slug = preg_replace('/[^a-zA-Z0-9]/', '-', $postData['slug']);
             $this->tags = htmlspecialchars(strip_tags($postData['tags']));
             $this->isHidden = htmlspecialchars(strip_tags($postData['isHidden']));
             $this->coverImage = htmlspecialchars(strip_tags($postData['coverImage']));
-            $this->readTime = htmlspecialchars(strip_tags($postData['readTime']));
+            $this->readTime = $postData['readTime'];
             $id = htmlspecialchars(strip_tags($postData['id']));
 
             // Bind data
