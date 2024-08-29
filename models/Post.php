@@ -221,6 +221,7 @@ class Post
             JOIN users u ON posts.authorId = u.id
             LEFT JOIN likes l ON posts.id = l.postId
             LEFT JOIN comments c ON posts.id = c.postId
+            WHERE posts.isHidden = 0
             GROUP BY 
     posts.id, 
     u.name, 
