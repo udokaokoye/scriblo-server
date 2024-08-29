@@ -123,7 +123,7 @@ class Post
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id
                 JOIN tags ON post_tags.tagId = tags.id
-                WHERE tags.id IN ($categories) ORDER BY posts.createdAt DESC";
+                WHERE tags.id IN ($categories) AND isHidden = 0  ORDER BY posts.createdAt DESC";
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute();
@@ -138,7 +138,7 @@ class Post
                 $query = " SELECT DISTINCT posts.*, u.name AS authorName, u.verified AS authorVerified, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
                 FROM posts
                 JOIN post_tags ON posts.id = post_tags.postId
-                JOIN users u ON posts.authorId = u.id ORDER BY posts.createdAt DESC
+                JOIN users u ON posts.authorId = u.id WHERE isHidden = 0 ORDER BY posts.createdAt DESC
                 ";
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
@@ -221,6 +221,7 @@ class Post
             JOIN users u ON posts.authorId = u.id
             LEFT JOIN likes l ON posts.id = l.postId
             LEFT JOIN comments c ON posts.id = c.postId
+            WHERE posts.isHidden = 0
             GROUP BY 
     posts.id, 
     u.name, 
@@ -271,9 +272,10 @@ class Post
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id
                 JOIN tags ON post_tags.tagId = tags.id
-                WHERE posts.title LIKE :query OR 
-                posts.slug LIKE :query OR 
-                tags.name LIKE :query  ORDER BY posts.createdAt DESC";
+               WHERE (posts.title LIKE :query OR 
+                 posts.slug LIKE :query OR 
+                 tags.name LIKE :query) 
+          AND posts.isHidden = 0  ORDER BY posts.createdAt DESC";
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
                 $searchQuery = '%' . $searchQuery . '%';
@@ -307,7 +309,7 @@ class Post
                 JOIN post_tags ON posts.id = post_tags.postId
                 JOIN users u ON posts.authorId = u.id
                 JOIN tags ON post_tags.tagId = tags.id
-                WHERE tags.name LIKE '%$searchQuery%' ORDER BY posts.createdAt DESC";
+                WHERE tags.name LIKE '%$searchQuery%' AND isHidden = 0 ORDER BY posts.createdAt DESC";
                 // Prepare statement
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute();
@@ -495,7 +497,7 @@ class Post
     {
         try {
             $query = "SELECT DISTINCT bookmarks.id AS bookmarkId, posts.*, u.name AS authorName, u.username AS authorUsername, u.email AS authorEmail, u.avatar AS authorAvatar 
-            FROM bookmarks JOIN posts ON bookmarks.postId = posts.id JOIN users u ON posts.authorId = u.id WHERE userID = '$userID' ORDER BY bookmarks.createdAt DESC";
+            FROM bookmarks JOIN posts ON bookmarks.postId = posts.id JOIN users u ON posts.authorId = u.id WHERE userID = '$userID' AND isHidden = 0 ORDER BY bookmarks.createdAt DESC";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
